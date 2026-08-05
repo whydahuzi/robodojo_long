@@ -37,7 +37,7 @@ Options:
   --ckpt-root PATH       Checkpoint parent directory (default shown above)
   --ckpt PATH            Use one checkpoint for every selected seed (legacy override)
   --seeds 0,1,2          Seeds to evaluate (default: 0,1,2)
-  --policy-env PATH      Pi_05 conda/uv environment (default: /root/miniconda3/envs/pi05)
+  --policy-env ENV       Pi_05 Conda environment name or path (default: /root/miniconda3/envs/pi05)
   --eval-env PATH        RoboDojo simulator environment (default: /root/miniconda3/envs/RoboDojo)
   --env-cfg NAME         Environment config (default: arx_x5)
   --action-type NAME     Action type (default: joint)

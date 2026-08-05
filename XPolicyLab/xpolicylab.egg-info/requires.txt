@@ -1,0 +1,8 @@
+numpy>=1.23
+pyyaml>=6
+opencv-python-headless>=4.8
+h5py>=3.8
+websockets>=13.0
+msgpack>=1.0.8
+msgpack-numpy>=0.4.8
+pydantic>=2.5

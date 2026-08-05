@@ -1,0 +1,136 @@
+{
+    "codebase_version": "v3.0",
+    "robot_type": "dual_x5",
+    "total_episodes": 0,
+    "total_frames": 0,
+    "total_tasks": 0,
+    "chunks_size": 1000,
+    "data_files_size_in_mb": 100,
+    "video_files_size_in_mb": 200,
+    "fps": 50,
+    "splits": {},
+    "data_path": "data/chunk-{chunk_index:03d}/file-{file_index:03d}.parquet",
+    "video_path": null,
+    "features": {
+        "observation.state": {
+            "dtype": "float32",
+            "shape": [
+                14
+            ],
+            "names": [
+                "left_0",
+                "left_1",
+                "left_2",
+                "left_3",
+                "left_4",
+                "left_5",
+                "left_ee_0",
+                "right_0",
+                "right_1",
+                "right_2",
+                "right_3",
+                "right_4",
+                "right_5",
+                "right_ee_0"
+            ]
+        },
+        "action": {
+            "dtype": "float32",
+            "shape": [
+                14
+            ],
+            "names": [
+                [
+                    "left_0",
+                    "left_1",
+                    "left_2",
+                    "left_3",
+                    "left_4",
+                    "left_5",
+                    "left_ee_0",
+                    "right_0",
+                    "right_1",
+                    "right_2",
+                    "right_3",
+                    "right_4",
+                    "right_5",
+                    "right_ee_0"
+                ]
+            ]
+        },
+        "observation.images.cam_high": {
+            "dtype": "image",
+            "shape": [
+                3,
+                480,
+                640
+            ],
+            "names": [
+                "height",
+                "width",
+                "channels"
+            ]
+        },
+        "observation.images.cam_left_wrist": {
+            "dtype": "image",
+            "shape": [
+                3,
+                480,
+                640
+            ],
+            "names": [
+                "height",
+                "width",
+                "channels"
+            ]
+        },
+        "observation.images.cam_right_wrist": {
+            "dtype": "image",
+            "shape": [
+                3,
+                480,
+                640
+            ],
+            "names": [
+                "height",
+                "width",
+                "channels"
+            ]
+        },
+        "timestamp": {
+            "dtype": "float32",
+            "shape": [
+                1
+            ],
+            "names": null
+        },
+        "frame_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null
+        },
+        "episode_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null
+        },
+        "index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null
+        },
+        "task_index": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ],
+            "names": null
+        }
+    }
+}

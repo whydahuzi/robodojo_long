@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: xpolicylab
+Version: 0.0.1
+Requires-Python: >=3.10
+License-File: LICENSE
+Requires-Dist: numpy>=1.23
+Requires-Dist: pyyaml>=6
+Requires-Dist: opencv-python-headless>=4.8
+Requires-Dist: h5py>=3.8
+Requires-Dist: websockets>=13.0
+Requires-Dist: msgpack>=1.0.8
+Requires-Dist: msgpack-numpy>=0.4.8
+Requires-Dist: pydantic>=2.5
+Dynamic: license-file
