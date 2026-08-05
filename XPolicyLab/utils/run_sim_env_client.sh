@@ -15,6 +15,9 @@ env_gpu_id="${11}"
 policy_server_ip="${12:-localhost}"
 protocol="${13:-ws}"
 
+# Non-interactive worker shells do not necessarily inherit the Conda PATH
+# initialized by ~/.bashrc.
+export PATH="/root/miniconda3/bin:/root/miniconda3/condabin:${PATH}"
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda deactivate || true
 conda activate "${eval_env_conda_env}"
