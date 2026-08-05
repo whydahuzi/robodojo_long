@@ -22,6 +22,12 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda deactivate || true
 conda activate "${eval_env_conda_env}"
 
+# cuRobo's source checkout derives its version with `git status` at import
+# time.  That can block beyond its 40-second timeout while parallel workers
+# hold Git/LFS locks.  A valid PEP 440 version lets setuptools-scm skip the
+# runtime Git query entirely.
+export SETUPTOOLS_SCM_PRETEND_VERSION="${SETUPTOOLS_SCM_PRETEND_VERSION:-0.8.0}"
+
 echo -e "\033[34m[CLIENT] Activating Conda environment: ${eval_env_conda_env}\033[0m"
 echo -e "\033[34m[CLIENT] Connecting to server ${policy_server_ip}:${policy_server_port}...\033[0m"
 echo -e "\033[34m[CLIENT] Watch for green [CONNECTED]; yellow [RECONNECT] means the client is retrying.\033[0m"
