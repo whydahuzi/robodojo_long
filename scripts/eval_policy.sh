@@ -106,11 +106,9 @@ fi
 # The parallel Pi_05 runner enables physical mode so all three stacks target
 # the same adapter without Isaac Sim's multi-process enumeration mismatch.
 isaac_physical_gpu_mode="${ROBODOJO_ISAAC_GPU_MODE:-}"
-app_device="cuda:0"
 if [[ -n "${device_id}" ]]; then
   if [[ "${isaac_physical_gpu_mode}" == "physical" ]]; then
     unset CUDA_VISIBLE_DEVICES
-    app_device="cuda:${device_id}"
     echo "[INFO] Isaac physical GPU mode: CUDA/PhysX/Vulkan GPU=${device_id}"
   else
     export CUDA_VISIBLE_DEVICES="${device_id}"
@@ -163,7 +161,6 @@ while : ; do
     --num_envs "$num_envs" \
     --enable_cameras \
     --kit_args "$KIT_ARGS" \
-    --device "$app_device" \
     --robodojo-device-id "$device_id" \
     --policy_name "$policy_name" \
     --port "$port" \
