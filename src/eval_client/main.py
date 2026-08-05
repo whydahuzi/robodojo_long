@@ -3,6 +3,7 @@ from datetime import datetime
 import importlib
 import json
 import os
+import signal
 import sys
 
 from isaaclab.app import AppLauncher
@@ -131,6 +132,20 @@ if enable_monitor:
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
+
+def _handle_sigterm(_signum, _frame):
+    """Preserve SIGTERM as a failed/interrupted evaluation exit."""
+    try:
+        simulation_app.close()
+    finally:
+        raise SystemExit(128 + signal.SIGTERM)
+
+
+# AppLauncher installs a SIGTERM handler that only closes Kit.  If evaluation
+# is interrupted, that handler lets Python return 0 and the shell prints the
+# misleading "eval finished" message.  Restore the standard non-zero outcome.
+signal.signal(signal.SIGTERM, _handle_sigterm)
+
 from omegaconf import OmegaConf
 
 from env.global_configs import *
@@ -142,10 +157,9 @@ from utils.pipeline_utils import *
 BENCHMARK_PATH = os.path.join(ROOT_DIR, "task", BENCHMARK)
 
 
-def _eval_batch_from_deploy(policy_name):
+def _policy_deploy_config(policy_name):
     deploy_yml_path = os.path.join(ROOT_DIR, "XPolicyLab", "policy", policy_name, "deploy.yml")
-    deploy_yml = load_yaml(deploy_yml_path) if os.path.isfile(deploy_yml_path) else {}
-    return bool(deploy_yml.get("eval_batch", False))
+    return load_yaml(deploy_yml_path) if os.path.isfile(deploy_yml_path) else {}
 
 
 def _resume_manifest_path(eval_cfg, run_id):
@@ -264,7 +278,8 @@ def main():
     eval_cfg["task_name"] = task_name
     eval_cfg["num_envs"] = num_envs
     eval_cfg["device_id"] = args_cli.device_id
-    eval_batch = _eval_batch_from_deploy(args_cli.policy_name)
+    policy_deploy_cfg = _policy_deploy_config(args_cli.policy_name)
+    eval_batch = bool(policy_deploy_cfg.get("eval_batch", False))
     eval_cfg["eval_batch"] = eval_batch
     eval_cfg["policy_name"] = args_cli.policy_name
     eval_cfg["additional_info"] = args_cli.additional_info
@@ -281,6 +296,8 @@ def main():
     deploy_cfg["trial_id"] = f"{task_name}-{os.environ['ROBODOJO_RUN_ID']}"
     deploy_cfg["action_case_id"] = f"{task_name}_case"
     deploy_cfg["repeat_index"] = None
+    deploy_cfg["ws_ping_interval_s"] = policy_deploy_cfg.get("ws_ping_interval_s", 20.0)
+    deploy_cfg["ws_ping_timeout_s"] = policy_deploy_cfg.get("ws_ping_timeout_s", 20.0)
     env_cfg = OmegaConf.create(
         {
             "sim": load_yaml(os.path.join(ENV_CONFIG_PATH, "sim", eval_cfg["config"]["sim"] + ".yml")),
@@ -428,7 +445,6 @@ def main():
                 f"refill from queue={replacements}; new batch={env.env_seeds}; "
                 f"real_remaining={real_remaining}"
             )
-            env.close()
             if real_remaining == 0:
                 print("[PhysX] no real seeds remaining in this batch, advancing.")
                 retry_round = False
@@ -448,12 +464,16 @@ def main():
             print("No more seeds to run, exiting.")
             break
 
-        env.close()
-
     _delete_resume_manifest(env)
     _close_model_client(env)
-    env.close()
-    simulation_app.close()
+    try:
+        env.close()
+    except Exception as e:
+        # GPU prim deletion can invalidate the shared PhysX tensor view during
+        # teardown.  Evaluation is already complete; Kit still must be closed.
+        print(f"[main] environment cleanup warning: {type(e).__name__}: {e}", flush=True)
+    finally:
+        simulation_app.close()
 
 
 if __name__ == "__main__":

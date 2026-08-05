@@ -170,6 +170,7 @@ while : ; do
     --seed "$seed" \
     --host "$host" \
     --headless \
+    --experience isaaclab.python.headless.rendering.kit \
     "${extra_args[@]}" \
     "$@"
   rc=$?

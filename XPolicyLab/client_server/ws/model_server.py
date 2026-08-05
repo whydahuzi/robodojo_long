@@ -14,6 +14,7 @@ from typing import Any
 
 import yaml
 from websockets.asyncio.server import Server, ServerConnection, serve
+from websockets.exceptions import ConnectionClosed
 
 from client_server.ws.protocol.codec import decode_envelope, encode_frame
 from client_server.ws.protocol.exceptions import ErrorCode, WsError
@@ -133,6 +134,8 @@ class PolicyServer:
                 task = asyncio.create_task(respond(frame))
                 pending.add(task)
                 task.add_done_callback(pending.discard)
+        except ConnectionClosed as exc:
+            logger.info("websocket client disconnected: %s", exc)
         finally:
             if pending:
                 await asyncio.gather(*pending, return_exceptions=True)
