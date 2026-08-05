@@ -2,6 +2,11 @@
 policy_name: Pi_05
 protocol: ws
 host: localhost
+# Local evaluation can block the event loop during first-time JAX compilation
+# and Isaac scene setup. Disable WebSocket keepalive so that long inference
+# does not get mistaken for a dead policy server.
+ws_ping_interval_s: null
+ws_ping_timeout_s: null
 bench_name: null
 task_name: null
 env_cfg_type: null
