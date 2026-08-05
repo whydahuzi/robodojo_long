@@ -180,6 +180,7 @@ class CameraView(XFormPrim):
         scales: np.ndarray | torch.Tensor | wp.array | None = None,
         visibilities: np.ndarray | torch.Tensor | wp.array | None = None,
         reset_xform_properties: bool = True,
+        device: str = "cuda",
     ):
         XFormPrim.__init__(
             self,
@@ -192,6 +193,7 @@ class CameraView(XFormPrim):
             visibilities=visibilities,
             reset_xform_properties=reset_xform_properties,
         )
+        self.device = str(device)
         self._output_annotators = output_annotators
         self._annotators = dict()
         self.camera_resolution = camera_resolution
@@ -246,15 +248,15 @@ class CameraView(XFormPrim):
             # get annotator
             if annotator_type == "rgba" or annotator_type == "rgb":
                 self._annotators["rgba"] = rep.AnnotatorRegistry.get_annotator(
-                    "rgb", device="cuda", do_array_copy=False
+                    "rgb", device=self.device, do_array_copy=False
                 )
             elif annotator_type == "depth" or annotator_type == "distance_to_image_plane":
                 self._annotators["distance_to_image_plane"] = rep.AnnotatorRegistry.get_annotator(
-                    "distance_to_image_plane", device="cuda", do_array_copy=False
+                    "distance_to_image_plane", device=self.device, do_array_copy=False
                 )
             else:
                 self._annotators[annotator_type] = rep.AnnotatorRegistry.get_annotator(
-                    annotator_type, device="cuda", do_array_copy=False
+                    annotator_type, device=self.device, do_array_copy=False
                 )
         # attach the annotator to the render product
         for annotator in self._annotators.values():
@@ -298,7 +300,7 @@ class CameraView(XFormPrim):
         if out is not None:
             output_device = str(out.device) if hasattr(out, "device") else "cuda"
         else:
-            output_device = "cuda"
+            output_device = self.device
         # get the linear sensor data from the tiled annotator and (if needed) slice it to get only the RGB data
         data = self._annotators[spec["name"]].get_data(device=output_device)
         # check whether returned data is a dict (used for segmentation)

@@ -155,7 +155,7 @@ setup_isaaclab() {
     export OMNI_KIT_ACCEPT_EULA=YES
     # isaaclab.sh calls `tabs`; fails when TERM=dumb (CI / piped shells)
     export TERM=xterm-256color
-    ./isaaclab.sh --install "$ISAACLAB_RL_FRAMEWORK"
+    bash ./isaaclab.sh --install "$ISAACLAB_RL_FRAMEWORK"
     cd "$CURRENT_DIR"
     ensure_torch_cuda_stack
     pin_runtime_deps

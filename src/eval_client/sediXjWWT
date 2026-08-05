@@ -18,14 +18,7 @@ parser.add_argument(
     required=True,
     help="config file name for evaluation",
 )
-parser.add_argument(
-    "--robodojo-device-id",
-    "--device_id",
-    dest="device_id",
-    type=int,
-    required=True,
-    help="physical GPU id for the current process",
-)
+parser.add_argument("--robodojo-device-id", dest="device_id", type=int, required=True, help="the device id for current process")
 parser.add_argument(
     "--policy_name",
     type=str,
@@ -310,9 +303,7 @@ def main():
             "deploy_cfg": deploy_cfg,
         }
     )
-    # In physical-GPU mode CUDA_VISIBLE_DEVICES is intentionally unset so Kit
-    # can enumerate Vulkan/CUDA adapters consistently. Explicitly bind the
-    # Isaac simulation config to the requested physical adapter as well.
+    # In physical-GPU mode, keep IsaacLab simulation on the same physical adapter as Kit/Vulkan.
     if os.environ.get("ROBODOJO_ISAAC_GPU_MODE") == "physical":
         OmegaConf.update(env_cfg, "sim.device", f"cuda:{args_cli.device_id}", force_add=True)
     capped_num_envs = resolve_random_task_num_envs(task_name, num_envs, env_cfg.sim)

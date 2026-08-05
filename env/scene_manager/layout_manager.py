@@ -431,9 +431,15 @@ class LayoutManager:
             if not relative:
                 env_pos = deepcopy(self.scene_manager.env_origins[env_idx]).to(device)
                 pos = pos + env_pos
+            # Layout/reward callers use NumPy geometry operations. Isaac returns
+            # these transforms on the simulation GPU, which NumPy cannot consume.
+            if isinstance(pos, torch.Tensor):
+                pos = pos.detach().cpu().numpy()
+            if isinstance(rot, torch.Tensor):
+                rot = rot.detach().cpu().numpy()
             return (pos, rot)
         elif instance_type in ["garment", "geometry"]:
-            state = obj.get_state(is_relative=True)
+            state = obj.get_state(is_relative=relative)
             root_pose = state["root_pose"].detach().cpu().numpy()
             pos = root_pose[:3]
             rot = root_pose[3:]

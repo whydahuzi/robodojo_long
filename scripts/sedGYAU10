@@ -102,9 +102,9 @@ if [[ -n "${policy_server_url}" ]]; then
   echo "[INFO] policy_server_url = ${policy_server_url}"
 fi
 
-# CUDA_VISIBLE_DEVICES renumbers GPUs, whereas Vulkan/Kit uses physical IDs.
-# The parallel Pi_05 runner enables physical mode so all three stacks target
-# the same adapter without Isaac Sim's multi-process enumeration mismatch.
+# CUDA visibility renumbers GPUs, whereas Vulkan/Kit uses physical GPU ids.
+# The parallel Pi_05 runner enables physical mode to keep CUDA, PhysX and
+# Vulkan on the same adapter. Existing single-GPU behavior is unchanged.
 isaac_physical_gpu_mode="${ROBODOJO_ISAAC_GPU_MODE:-}"
 app_device="cuda:0"
 if [[ -n "${device_id}" ]]; then
@@ -114,10 +114,9 @@ if [[ -n "${device_id}" ]]; then
     echo "[INFO] Isaac physical GPU mode: CUDA/PhysX/Vulkan GPU=${device_id}"
   else
     export CUDA_VISIBLE_DEVICES="${device_id}"
-    echo "[INFO] device_id = ${device_id} → CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
+    echo "[INFO] device_id = ${device_id} -> CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
   fi
 fi
-
 if [[ -n "${eval_batch}" ]]; then
   echo "[INFO] eval_batch     = ${eval_batch}"
 fi

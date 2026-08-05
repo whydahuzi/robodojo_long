@@ -107,6 +107,7 @@ class TiledCaptureManager:
                 prim_paths_by_cam_id,
                 camera_resolution=[width, height],
                 output_annotators=self.annotator_type[cam_id],
+                device=str(self.device),
             )
             self.tiled_cameras.append(tiled_camera)
             self.tiled_render_products.append(tiled_camera._render_product)
@@ -127,7 +128,9 @@ class TiledCaptureManager:
                 # Pre-allocate warp array on CUDA to reuse memory
                 import warp as wp
 
-                self._output_buffers[cam_id][annotator_name] = wp.zeros(shape, dtype=spec["dtype"], device="cuda:0")
+                self._output_buffers[cam_id][annotator_name] = wp.zeros(
+                    shape, dtype=spec["dtype"], device=str(self.device)
+                )
 
     def step(self, env_ids: List[int] = None, cam_ids: List[int] = None) -> List[List[List[any]]]:
         """

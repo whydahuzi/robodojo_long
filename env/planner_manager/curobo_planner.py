@@ -31,6 +31,7 @@ class CuroboPlanner:
         dt=None,
         yml_path=None,
         table_height=0.74,
+        device=None,
     ):
         if yml_path is not None:
             self.yml_path = yml_path
@@ -67,7 +68,12 @@ class CuroboPlanner:
                 )
             self._active_to_cspace_idx.append(self.cspace_joint_names.index(joint_name))
 
-        self.device_cfg = DeviceCfg()
+        if device is None:
+            raise ValueError("CuroboPlanner requires the current Isaac Sim device.")
+        # Keep CuRobo tensors on the same CUDA device as Isaac Sim.  DeviceCfg
+        # otherwise defaults to cuda:0, which defeats physical-GPU scheduling.
+        self.device_cfg = DeviceCfg(device=torch.device(device))
+        print(f"[CuroboPlanner] Using device: {self.device_cfg.device}")
 
         self.use_cuda_graph = True
 

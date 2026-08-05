@@ -546,6 +546,7 @@ class RobotManager:
                 dt=self.dt,
                 yml_path=robot.curobo_yml_path,
                 table_height=0.74 - root_pose[2],
+                device=self.device,
             )
             self.ik_solver[robot.robot_name] = self.planner[robot.robot_name]
 

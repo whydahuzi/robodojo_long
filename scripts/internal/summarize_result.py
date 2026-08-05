@@ -89,15 +89,23 @@ def list_subdirs(path):
     )
 
 
-def latest_timestamp_dir(run_dir):
-    """Return the latest timestamp subdir that contains a `_result.json`."""
+def latest_result_dir(run_dir):
+    """Return the latest result directory below a seed run directory.
+
+    Usually results are stored directly as ``<run>/<timestamp>/_result.json``.
+    A checkpoint name can, however, be an absolute path; if it is embedded in
+    the run name, its ``/`` characters turn that logical run name into nested
+    directories.  Search below ``run_dir`` so both layouts are supported.
+    """
     candidates = []
-    for name in list_subdirs(run_dir):
-        if os.path.isfile(os.path.join(run_dir, name, "_result.json")):
-            candidates.append(name)
+    for root, _dirs, files in os.walk(run_dir):
+        if "_result.json" in files:
+            # Timestamp format `YYYY-MM-DD_HH-MM-SS` sorts chronologically as
+            # a string.  Non-timestamp result labels (e.g. `pi05_full_*`) keep
+            # the pre-existing lexical selection behavior.
+            candidates.append(os.path.relpath(root, run_dir))
     if not candidates:
         return None
-    # Timestamp format `YYYY-MM-DD_HH-MM-SS` sorts chronologically as a string.
     return os.path.join(run_dir, sorted(candidates)[-1])
 
 
@@ -135,10 +143,14 @@ def scan_task(task):
                 if not m:
                     continue
                 seed = int(m.group(1))
-                ts_dir = latest_timestamp_dir(os.path.join(emb_path, run))
+                run_dir = os.path.join(emb_path, run)
+                ts_dir = latest_result_dir(run_dir)
                 if ts_dir is None:
                     continue
-                ts_name = os.path.basename(ts_dir)
+                # Keep the full relative path: absolute checkpoint names may
+                # introduce nested directories between the seed run and the
+                # actual result directory.
+                ts_name = os.path.relpath(ts_dir, run_dir)
                 entries = load_entries(ts_dir)
                 if entries is None:
                     continue
